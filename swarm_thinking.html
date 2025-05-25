@@ -1,364 +1,330 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Swarm Thinking Visualization</title>
-  <style>
-    body {
-      background: radial-gradient(ellipse at 50% 30%, #23243a 60%, #181a1f 100%);
-      min-height: 100vh;
-      margin: 0;
-    }
-    #hd-brain-galaxy {
-      width: 100%;
-      max-width: 700px;
-      height: 440px;
-      margin: 40px auto;
-      display: block;
-      background: #181a1f;
-      border-radius: 32px;
-      box-shadow: 0 8px 48px 0 #000a, 0 1.5px 8px 0 #a259f733;
-    }
-    .swarm-title {
-      color: #fff;
-      font-family: Segoe UI, Arial, sans-serif;
-      font-weight: 700;
-      margin: 0 0 4px 0;
-      font-size: 2rem;
-      letter-spacing: 0.01em;
-      text-align: center;
-      text-shadow: 0 2px 8px #000b;
-    }
-    .swarm-subtitle {
-      color: #a259f7;
-      font-family: Segoe UI, Arial, sans-serif;
-      font-size: 1.1rem;
-      font-weight: 400;
-      text-align: center;
-      margin-bottom: 18px;
-      text-shadow: 0 2px 8px #000b;
-    }
-  </style>
-</head>
-<body>
-  <div class="swarm-title">Swarm Thinking</div>
-  <div class="swarm-subtitle">Visualizing Agent Memory and Shared Environment</div>
-  <svg id="hd-brain-galaxy" viewBox="0 0 700 440">
-    <!-- Milky Way Galaxy (center) -->
-    <g id="galaxy">
-      <ellipse cx="350" cy="220" rx="100" ry="44" fill="url(#galaxyGradient)" filter="url(#galaxyBlur)" opacity="0.9"/>
-      <ellipse cx="350" cy="220" rx="70" ry="28" fill="url(#galaxyGradient2)" opacity="0.7"/>
-      <g id="galaxy-stars"></g>
-      <g id="galaxy-swirl"></g>
-      <circle cx="350" cy="220" r="22" fill="url(#galaxyCore)" opacity="0.7" filter="url(#coreGlow)"/>
+<style>
+#hd-brain-galaxy {
+  width: 100%;
+  max-width: 700px;
+  height: 440px;
+  margin: 40px auto;
+  display: block;
+  background: #181a1f;
+  border-radius: 32px;
+  box-shadow: 0 0 48px #000a;
+}
+</style>
+
+<svg id="hd-brain-galaxy" viewBox="0 0 700 440">
+  <!-- Milky Way Galaxy (center) -->
+  <g id="galaxy">
+    <ellipse cx="350" cy="220" rx="100" ry="44" fill="url(#galaxyGradient)" filter="url(#galaxyBlur)" opacity="0.9"/>
+    <ellipse cx="350" cy="220" rx="70" ry="28" fill="url(#galaxyGradient2)" opacity="0.7"/>
+    <g id="galaxy-stars"></g>
+    <g id="galaxy-swirl"></g>
+    <circle cx="350" cy="220" r="22" fill="url(#galaxyCore)" opacity="0.7" filter="url(#coreGlow)"/>
+  </g>
+  <!-- Agents as detailed glowing nodes (Saturn rings removed) -->
+  <g id="agents">
+    <g id="agent1">
+      <circle cx="120" cy="90" r="38" fill="url(#agent1Grad)" filter="url(#glow)" />
     </g>
-    <!-- Agents as detailed glowing nodes -->
-    <g id="agents">
-      <g id="agent1">
-        <circle cx="120" cy="90" r="38" fill="url(#agent1Grad)" filter="url(#glow)" />
-      </g>
-      <g id="agent2">
-        <circle cx="580" cy="90" r="38" fill="url(#agent2Grad)" filter="url(#glow)" />
-      </g>
-      <g id="agent3">
-        <circle cx="580" cy="350" r="38" fill="url(#agent3Grad)" filter="url(#glow)" />
-      </g>
-      <g id="agent4">
-        <circle cx="120" cy="350" r="38" fill="url(#agent4Grad)" filter="url(#glow)" />
-      </g>
+    <g id="agent2">
+      <circle cx="580" cy="90" r="38" fill="url(#agent2Grad)" filter="url(#glow)" />
     </g>
-    <!-- High quality labels -->
-    <g id="labels" font-family="Segoe UI, Arial, sans-serif" font-weight="bold" font-size="18">
-      <text x="120" y="55" fill="#a259f7" text-anchor="middle" filter="url(#glow)" style="text-shadow:0 2px 8px #000b;">
-        Agent 1
-        <tspan x="120" dy="1.2em" font-size="13" font-weight="normal" fill="#fff" style="text-shadow:0 2px 8px #000b;">Private Memory</tspan>
-      </text>
-      <text x="580" y="55" fill="#4fdfff" text-anchor="middle" filter="url(#glow)" style="text-shadow:0 2px 8px #000b;">
-        Agent 2
-        <tspan x="580" dy="1.2em" font-size="13" font-weight="normal" fill="#fff" style="text-shadow:0 2px 8px #000b;">Private Memory</tspan>
-      </text>
-      <text x="580" y="395" fill="#ff3a3a" text-anchor="middle" filter="url(#glow)" style="text-shadow:0 2px 8px #000b;">
-        Agent 3
-        <tspan x="580" dy="1.2em" font-size="13" font-weight="normal" fill="#fff" style="text-shadow:0 2px 8px #000b;">Private Memory</tspan>
-      </text>
-      <text x="120" y="395" fill="#ffe14f" text-anchor="middle" filter="url(#glow)" style="text-shadow:0 2px 8px #000b;">
-        Agent 4
-        <tspan x="120" dy="1.2em" font-size="13" font-weight="normal" fill="#fff" style="text-shadow:0 2px 8px #000b;">Private Memory</tspan>
-      </text>
-      <ellipse cx="350" cy="220" rx="110" ry="38" fill="#a259f7" opacity="0.13" filter="url(#coreGlow)" />
-      <text x="350" y="220" fill="#fff" text-anchor="middle" font-size="20" filter="url(#glow)" style="text-shadow:0 2px 8px #000b;">
-        Shared Environment
-      </text>
+    <g id="agent3">
+      <circle cx="580" cy="350" r="38" fill="url(#agent3Grad)" filter="url(#glow)" />
     </g>
-    <defs>
-      <radialGradient id="galaxyGradient" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="0.8"/>
-        <stop offset="60%" stop-color="#a259f7" stop-opacity="0.5"/>
-        <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="galaxyGradient2" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#ffe14f" stop-opacity="0.5"/>
-        <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="galaxyCore" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
-        <stop offset="100%" stop-color="#a259f7" stop-opacity="0"/>
-      </radialGradient>
-      <!-- Agent gradients -->
-      <radialGradient id="agent1Grad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
-        <stop offset="60%" stop-color="#a259f7" stop-opacity="0.7"/>
-        <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="agent2Grad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
-        <stop offset="60%" stop-color="#4fdfff" stop-opacity="0.7"/>
-        <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="agent3Grad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
-        <stop offset="60%" stop-color="#ff3a3a" stop-opacity="0.7"/>
-        <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="agent4Grad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
-        <stop offset="60%" stop-color="#ffe14f" stop-opacity="0.7"/>
-        <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
-      </radialGradient>
-      <!-- 3D orb glows and bodies -->
-      <radialGradient id="orbGlowPurple" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#a259f7" stop-opacity="0.7"/>
-        <stop offset="60%" stop-color="#a259f7" stop-opacity="0.15"/>
-        <stop offset="100%" stop-color="#a259f7" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="orbGlowBlue" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#4fdfff" stop-opacity="0.7"/>
-        <stop offset="60%" stop-color="#4fdfff" stop-opacity="0.15"/>
-        <stop offset="100%" stop-color="#4fdfff" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="orbGlowRed" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#ff3a3a" stop-opacity="0.7"/>
-        <stop offset="60%" stop-color="#ff3a3a" stop-opacity="0.15"/>
-        <stop offset="100%" stop-color="#ff3a3a" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="orbGlowYellow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#ffe14f" stop-opacity="0.7"/>
-        <stop offset="60%" stop-color="#ffe14f" stop-opacity="0.15"/>
-        <stop offset="100%" stop-color="#ffe14f" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="orbBodyPurple" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
-        <stop offset="60%" stop-color="#a259f7" stop-opacity="0.9"/>
-        <stop offset="100%" stop-color="#181a1f" stop-opacity="0.2"/>
-      </radialGradient>
-      <radialGradient id="orbBodyBlue" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
-        <stop offset="60%" stop-color="#4fdfff" stop-opacity="0.9"/>
-        <stop offset="100%" stop-color="#181a1f" stop-opacity="0.2"/>
-      </radialGradient>
-      <radialGradient id="orbBodyRed" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
-        <stop offset="60%" stop-color="#ff3a3a" stop-opacity="0.9"/>
-        <stop offset="100%" stop-color="#181a1f" stop-opacity="0.2"/>
-      </radialGradient>
-      <radialGradient id="orbBodyYellow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
-        <stop offset="60%" stop-color="#ffe14f" stop-opacity="0.9"/>
-        <stop offset="100%" stop-color="#181a1f" stop-opacity="0.2"/>
-      </radialGradient>
-      <filter id="galaxyBlur">
-        <feGaussianBlur stdDeviation="12"/>
-      </filter>
-      <filter id="coreGlow">
-        <feGaussianBlur stdDeviation="8"/>
-      </filter>
-      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
-        <feMerge>
-          <feMergeNode in="coloredBlur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-    </defs>
-    <!-- Mercury-morphing idea orbs (JS will animate these, now with pro glow) -->
-    <ellipse id="orb1" rx="12" ry="12" fill="url(#orbBodyPurple)" opacity="0.8" />
-    <ellipse id="orb2" rx="12" ry="12" fill="url(#orbBodyBlue)" opacity="0.8" />
-    <ellipse id="orb3" rx="12" ry="12" fill="url(#orbBodyRed)" opacity="0.8" />
-    <ellipse id="orb4" rx="12" ry="12" fill="url(#orbBodyYellow)" opacity="0.8" />
-    <g id="agent-orbs"></g>
-  </svg>
-  <script>
-    // Animate galaxy swirl and stars (unchanged)
-    function animateGalaxy() {
-      const swirl = document.getElementById('galaxy-swirl');
-      swirl.innerHTML = '';
-      let t = Date.now() * 0.0005;
-      for (let i = 0; i < 8; i++) {
-        let angle = t + i * Math.PI / 4;
-        let r = 70 + 18 * Math.sin(t*2 + i);
-        let x = 350 + r * Math.cos(angle);
-        let y = 220 + r * Math.sin(angle) * 0.5;
-        swirl.innerHTML += `<ellipse cx="${x}" cy="${y}" rx="7" ry="2" fill="#fff" opacity="0.13"/>`;
+    <g id="agent4">
+      <circle cx="120" cy="350" r="38" fill="url(#agent4Grad)" filter="url(#glow)" />
+    </g>
+  </g>
+  <!-- High quality labels -->
+  <g id="labels" font-family="Segoe UI, Arial, sans-serif" font-weight="bold" font-size="18">
+    <text x="120" y="55" fill="#a259f7" text-anchor="middle" filter="url(#glow)">
+      Agent 1
+      <tspan x="120" dy="1.2em" font-size="13" font-weight="normal" fill="#fff">Private Memory</tspan>
+    </text>
+    <text x="580" y="55" fill="#4fdfff" text-anchor="middle" filter="url(#glow)">
+      Agent 2
+      <tspan x="580" dy="1.2em" font-size="13" font-weight="normal" fill="#fff">Private Memory</tspan>
+    </text>
+    <text x="580" y="395" fill="#ff3a3a" text-anchor="middle" filter="url(#glow)">
+      Agent 3
+      <tspan x="580" dy="1.2em" font-size="13" font-weight="normal" fill="#fff">Private Memory</tspan>
+    </text>
+    <text x="120" y="395" fill="#ffe14f" text-anchor="middle" filter="url(#glow)">
+      Agent 4
+      <tspan x="120" dy="1.2em" font-size="13" font-weight="normal" fill="#fff">Private Memory</tspan>
+    </text>
+    <text x="350" y="220" fill="#fff" text-anchor="middle" font-size="20" filter="url(#glow)">
+      Shared Environment
+    </text>
+  </g>
+  <defs>
+    <radialGradient id="galaxyGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.8"/>
+      <stop offset="60%" stop-color="#a259f7" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="galaxyGradient2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe14f" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="galaxyCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#a259f7" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Agent gradients -->
+    <radialGradient id="agent1Grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#a259f7" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="agent2Grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#4fdfff" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="agent3Grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#ff3a3a" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="agent4Grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#ffe14f" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#181a1f" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 3D orb glows and bodies -->
+    <radialGradient id="orbGlowPurple" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#a259f7" stop-opacity="0.7"/>
+      <stop offset="60%" stop-color="#a259f7" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#a259f7" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orbGlowBlue" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4fdfff" stop-opacity="0.7"/>
+      <stop offset="60%" stop-color="#4fdfff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#4fdfff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orbGlowRed" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff3a3a" stop-opacity="0.7"/>
+      <stop offset="60%" stop-color="#ff3a3a" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#ff3a3a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orbGlowYellow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe14f" stop-opacity="0.7"/>
+      <stop offset="60%" stop-color="#ffe14f" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#ffe14f" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orbBodyPurple" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#a259f7" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#181a1f" stop-opacity="0.2"/>
+    </radialGradient>
+    <radialGradient id="orbBodyBlue" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#4fdfff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#181a1f" stop-opacity="0.2"/>
+    </radialGradient>
+    <radialGradient id="orbBodyRed" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#ff3a3a" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#181a1f" stop-opacity="0.2"/>
+    </radialGradient>
+    <radialGradient id="orbBodyYellow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#ffe14f" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#181a1f" stop-opacity="0.2"/>
+    </radialGradient>
+    <filter id="galaxyBlur">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+    <filter id="coreGlow">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Mercury-morphing idea orbs (JS will animate these, now with pro glow) -->
+  <ellipse id="orb1" rx="12" ry="12" fill="url(#orbBodyPurple)" opacity="0.8" />
+  <ellipse id="orb2" rx="12" ry="12" fill="url(#orbBodyBlue)" opacity="0.8" />
+  <ellipse id="orb3" rx="12" ry="12" fill="url(#orbBodyRed)" opacity="0.8" />
+  <ellipse id="orb4" rx="12" ry="12" fill="url(#orbBodyYellow)" opacity="0.8" />
+  <g id="agent-orbs"></g>
+</svg>
+
+<script>
+// Animate galaxy swirl and stars (unchanged)
+function animateGalaxy() {
+  const swirl = document.getElementById('galaxy-swirl');
+  swirl.innerHTML = '';
+  let t = Date.now() * 0.0005;
+  for (let i = 0; i < 8; i++) {
+    let angle = t + i * Math.PI / 4;
+    let r = 70 + 18 * Math.sin(t*2 + i);
+    let x = 350 + r * Math.cos(angle);
+    let y = 220 + r * Math.sin(angle) * 0.5;
+    swirl.innerHTML += `<ellipse cx="${x}" cy="${y}" rx="7" ry="2" fill="#fff" opacity="0.13"/>`;
+  }
+  // Stars
+  const stars = document.getElementById('galaxy-stars');
+  stars.innerHTML = '';
+  for (let i = 0; i < 24; i++) {
+    let angle = t*2 + i * Math.PI / 12;
+    let r = 30 + 70 * Math.abs(Math.sin(t + i));
+    let x = 350 + r * Math.cos(angle);
+    let y = 220 + r * Math.sin(angle) * 0.5;
+    stars.innerHTML += `<circle cx="${x}" cy="${y}" r="${Math.random()*1.5+0.5}" fill="#fff" opacity="0.10"/>`;
+  }
+  requestAnimationFrame(animateGalaxy);
+}
+animateGalaxy();
+
+// Agent and pool positions
+const agents = [
+  { x: 120, y: 90, color: "#a259f7" },   // Science
+  { x: 580, y: 90, color: "#4fdfff" },   // Gun
+  { x: 580, y: 350, color: "#ff3a3a" },  // Devil
+  { x: 120, y: 350, color: "#ffe14f" }   // Scales
+];
+const pool = { x: 350, y: 220 };
+
+// Each orb's state: {mode: 'fromPool'|'orbit', t: 0, to: idx}
+let orbs = [
+  { mode: 'fromPool', t: 0, to: 0 },
+  { mode: 'fromPool', t: 0, to: 1 },
+  { mode: 'fromPool', t: 0, to: 2 },
+  { mode: 'fromPool', t: 0, to: 3 }
+];
+
+// Mercury-morphing orbs animation (with pro 3D look)
+const orbBodyIds = ["orbBodyPurple", "orbBodyBlue", "orbBodyRed", "orbBodyYellow"];
+function animateOrbs() {
+  let now = Date.now();
+  orbs.forEach((orb, i) => {
+    let el = document.getElementById('orb' + (i+1));
+    let agent = agents[orb.to];
+    let angle = (now/900 + i*1.2) % (2*Math.PI);
+    // Mercury morph: rx and ry pulse, and the orb rotates
+    let base = 12 + 4 * Math.sin(now/400 + i*1.3);
+    let rx = base + 4 * Math.sin(now/300 + i*2.1);
+    let ry = base + 4 * Math.cos(now/500 + i*1.7);
+    let rot = (now/10 + i*90) % 360;
+    let cx, cy;
+    if (orb.mode === 'fromPool') {
+      orb.t += 0.012;
+      cx = pool.x + (agent.x - pool.x) * orb.t;
+      cy = pool.y + (agent.y - pool.y) * orb.t;
+      if (orb.t >= 1) {
+        orb.mode = 'orbit';
+        orb.t = 0;
       }
-      // Stars
-      const stars = document.getElementById('galaxy-stars');
-      stars.innerHTML = '';
-      for (let i = 0; i < 24; i++) {
-        let angle = t*2 + i * Math.PI / 12;
-        let r = 30 + 70 * Math.abs(Math.sin(t + i));
-        let x = 350 + r * Math.cos(angle);
-        let y = 220 + r * Math.sin(angle) * 0.5;
-        stars.innerHTML += `<circle cx="${x}" cy="${y}" r="${Math.random()*1.5+0.5}" fill="#fff" opacity="0.10"/>`;
+    } else if (orb.mode === 'orbit') {
+      let r = 48 + 10*Math.sin(now/700 + i);
+      cx = agent.x + r * Math.cos(angle);
+      cy = agent.y + r * Math.sin(angle);
+      if (Math.random() < 0.002) {
+        orb.mode = 'fromPool';
+        orb.t = 0;
+        orb.to = Math.floor(Math.random()*4);
       }
-      requestAnimationFrame(animateGalaxy);
     }
-    animateGalaxy();
+    el.setAttribute('cx', cx);
+    el.setAttribute('cy', cy);
+    el.setAttribute('rx', rx);
+    el.setAttribute('ry', ry);
+    el.setAttribute('transform', `rotate(${rot} ${cx} ${cy})`);
+    el.setAttribute('fill', `url(#${orbBodyIds[i]})`);
+    el.setAttribute('opacity', 0.8 + 0.2 * Math.sin(now/250 + i));
+  });
+  requestAnimationFrame(animateOrbs);
+}
+animateOrbs();
 
-    // Agent and pool positions
-    const agents = [
-      { x: 120, y: 90, color: "#a259f7" },   // Science
-      { x: 580, y: 90, color: "#4fdfff" },   // Gun
-      { x: 580, y: 350, color: "#ff3a3a" },  // Devil
-      { x: 120, y: 350, color: "#ffe14f" }   // Scales
-    ];
-    const pool = { x: 350, y: 220 };
+// --- Agent-to-pool orbs logic (3D radial gradient orbs) ---
+let agentOrbs = []; // {id, agentIdx, t}
+let agentOrbId = 1;
+const orbGlowMap = [
+  { glow: "orbGlowPurple", body: "orbBodyPurple" },
+  { glow: "orbGlowBlue", body: "orbBodyBlue" },
+  { glow: "orbGlowRed", body: "orbBodyRed" },
+  { glow: "orbGlowYellow", body: "orbBodyYellow" }
+];
 
-    // Each orb's state: {mode: 'fromPool'|'orbit', t: 0, to: idx}
-    let orbs = [
-      { mode: 'fromPool', t: 0, to: 0 },
-      { mode: 'fromPool', t: 0, to: 1 },
-      { mode: 'fromPool', t: 0, to: 2 },
-      { mode: 'fromPool', t: 0, to: 3 }
-    ];
+// Periodically spawn a new orb from each agent to the pool
+setInterval(() => {
+  agents.forEach((agent, idx) => {
+    agentOrbs.push({
+      id: 'agent-orb-' + (agentOrbId++),
+      agentIdx: idx,
+      t: 0
+    });
+    // Create SVG group for orb
+    let g = document.getElementById('agent-orbs');
+    let orbGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    orbGroup.setAttribute('id', agentOrbs[agentOrbs.length-1].id);
 
-    // Mercury-morphing orbs animation (with pro 3D look)
-    const orbBodyIds = ["orbBodyPurple", "orbBodyBlue", "orbBodyRed", "orbBodyYellow"];
-    function animateOrbs() {
-      let now = Date.now();
-      orbs.forEach((orb, i) => {
-        let el = document.getElementById('orb' + (i+1));
-        let agent = agents[orb.to];
-        let angle = (now/900 + i*1.2) % (2*Math.PI);
-        // Mercury morph: rx and ry pulse, and the orb rotates
-        let base = 12 + 4 * Math.sin(now/400 + i*1.3);
-        let rx = base + 4 * Math.sin(now/300 + i*2.1);
-        let ry = base + 4 * Math.cos(now/500 + i*1.7);
-        let rot = (now/10 + i*90) % 360;
-        let cx, cy;
-        if (orb.mode === 'fromPool') {
-          orb.t += 0.012;
-          cx = pool.x + (agent.x - pool.x) * orb.t;
-          cy = pool.y + (agent.y - pool.y) * orb.t;
-          if (orb.t >= 1) {
-            orb.mode = 'orbit';
-            orb.t = 0;
-          }
-        } else if (orb.mode === 'orbit') {
-          let r = 48 + 10*Math.sin(now/700 + i);
-          cx = agent.x + r * Math.cos(angle);
-          cy = agent.y + r * Math.sin(angle);
-          if (Math.random() < 0.002) {
-            orb.mode = 'fromPool';
-            orb.t = 0;
-            orb.to = Math.floor(Math.random()*4);
-          }
-        }
-        el.setAttribute('cx', cx);
-        el.setAttribute('cy', cy);
-        el.setAttribute('rx', rx);
-        el.setAttribute('ry', ry);
-        el.setAttribute('transform', `rotate(${rot} ${cx} ${cy})`);
-        el.setAttribute('fill', `url(#${orbBodyIds[i]})`);
-        el.setAttribute('opacity', 0.8 + 0.2 * Math.sin(now/250 + i));
-      });
-      requestAnimationFrame(animateOrbs);
+    // Glow ellipse (bigger, faint)
+    let glow = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    glow.setAttribute('fill', `url(#${orbGlowMap[idx].glow})`);
+    glow.setAttribute('opacity', 0.7);
+    orbGroup.appendChild(glow);
+
+    // Body ellipse (smaller, sharp)
+    let body = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    body.setAttribute('fill', `url(#${orbGlowMap[idx].body})`);
+    body.setAttribute('opacity', 1);
+    orbGroup.appendChild(body);
+
+    g.appendChild(orbGroup);
+  });
+}, 1800);
+
+function animateAgentOrbs() {
+  let removeIds = [];
+  agentOrbs.forEach((orb, i) => {
+    orb.t += 0.012;
+    let agent = agents[orb.agentIdx];
+    let cx = agent.x + (pool.x - agent.x) * orb.t;
+    let cy = agent.y + (pool.y - agent.y) * orb.t;
+    let dx = pool.x - agent.x, dy = pool.y - agent.y;
+    let theta = Math.atan2(dy, dx) * 180 / Math.PI;
+    let stretch = 1 + 1.2 * Math.sin(Math.PI * orb.t);
+    let rx = 10 * stretch;
+    let ry = 10 / stretch;
+    let glowRx = rx * 2.2;
+    let glowRy = ry * 2.2;
+    let opacity = 0.7 + 0.3 * Math.sin(Date.now()/200 + i);
+
+    let group = document.getElementById(orb.id);
+    if (group) {
+      let [glow, body] = group.children;
+      // Glow
+      glow.setAttribute('cx', cx);
+      glow.setAttribute('cy', cy);
+      glow.setAttribute('rx', glowRx);
+      glow.setAttribute('ry', glowRy);
+      glow.setAttribute('opacity', opacity * 0.7);
+      // Body
+      body.setAttribute('cx', cx);
+      body.setAttribute('cy', cy);
+      body.setAttribute('rx', rx);
+      body.setAttribute('ry', ry);
+      body.setAttribute('opacity', opacity);
+      group.setAttribute('transform', `rotate(${theta} ${cx} ${cy})`);
     }
-    animateOrbs();
-
-    // --- Agent-to-pool orbs logic (3D radial gradient orbs) ---
-    let agentOrbs = []; // {id, agentIdx, t}
-    let agentOrbId = 1;
-    const orbGlowMap = [
-      { glow: "orbGlowPurple", body: "orbBodyPurple" },
-      { glow: "orbGlowBlue", body: "orbBodyBlue" },
-      { glow: "orbGlowRed", body: "orbBodyRed" },
-      { glow: "orbGlowYellow", body: "orbBodyYellow" }
-    ];
-
-    // Periodically spawn a new orb from each agent to the pool
-    setInterval(() => {
-      agents.forEach((agent, idx) => {
-        agentOrbs.push({
-          id: 'agent-orb-' + (agentOrbId++),
-          agentIdx: idx,
-          t: 0
-        });
-        // Create SVG group for orb
-        let g = document.getElementById('agent-orbs');
-        let orbGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        orbGroup.setAttribute('id', agentOrbs[agentOrbs.length-1].id);
-
-        // Glow ellipse (bigger, faint)
-        let glow = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        glow.setAttribute('fill', `url(#${orbGlowMap[idx].glow})`);
-        glow.setAttribute('opacity', 0.7);
-        orbGroup.appendChild(glow);
-
-        // Body ellipse (smaller, sharp)
-        let body = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        body.setAttribute('fill', `url(#${orbGlowMap[idx].body})`);
-        body.setAttribute('opacity', 1);
-        orbGroup.appendChild(body);
-
-        g.appendChild(orbGroup);
-      });
-    }, 1800);
-
-    function animateAgentOrbs() {
-      let removeIds = [];
-      agentOrbs.forEach((orb, i) => {
-        orb.t += 0.012;
-        let agent = agents[orb.agentIdx];
-        let cx = agent.x + (pool.x - agent.x) * orb.t;
-        let cy = agent.y + (pool.y - agent.y) * orb.t;
-        let dx = pool.x - agent.x, dy = pool.y - agent.y;
-        let theta = Math.atan2(dy, dx) * 180 / Math.PI;
-        let stretch = 1 + 1.2 * Math.sin(Math.PI * orb.t);
-        let rx = 10 * stretch;
-        let ry = 10 / stretch;
-        let glowRx = rx * 2.2;
-        let glowRy = ry * 2.2;
-        let opacity = 0.7 + 0.3 * Math.sin(Date.now()/200 + i);
-
-        let group = document.getElementById(orb.id);
-        if (group) {
-          let [glow, body] = group.children;
-          // Glow
-          glow.setAttribute('cx', cx);
-          glow.setAttribute('cy', cy);
-          glow.setAttribute('rx', glowRx);
-          glow.setAttribute('ry', glowRy);
-          glow.setAttribute('opacity', opacity * 0.7);
-          // Body
-          body.setAttribute('cx', cx);
-          body.setAttribute('cy', cy);
-          body.setAttribute('rx', rx);
-          body.setAttribute('ry', ry);
-          body.setAttribute('opacity', opacity);
-          group.setAttribute('transform', `rotate(${theta} ${cx} ${cy})`);
-        }
-        if (orb.t >= 1) {
-          removeIds.push(orb.id);
-        }
-      });
-      removeIds.forEach(id => {
-        let group = document.getElementById(id);
-        if (group && group.parentNode) group.parentNode.removeChild(group);
-        agentOrbs = agentOrbs.filter(o => o.id !== id);
-      });
-      requestAnimationFrame(animateAgentOrbs);
+    if (orb.t >= 1) {
+      removeIds.push(orb.id);
     }
-    animateAgentOrbs();
-  </script>
-</body>
-</html>
+  });
+  removeIds.forEach(id => {
+    let group = document.getElementById(id);
+    if (group && group.parentNode) group.parentNode.removeChild(group);
+    agentOrbs = agentOrbs.filter(o => o.id !== id);
+  });
+  requestAnimationFrame(animateAgentOrbs);
+}
+animateAgentOrbs();
+</script>
