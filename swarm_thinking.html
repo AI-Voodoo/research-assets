@@ -3,11 +3,20 @@
   width: 100%;
   max-width: 700px;
   height: 440px;
-  margin: 0 auto;  /* Removed top margin */
+  margin: 0 auto;
   display: block;
   background: #181a1f;
   border-radius: 32px;
-  box-shadow: 0 0 48px #000a
+  box-shadow: 0 0 48px #000a;
+}
+
+/* This media query adjusts the size on smaller viewports */
+@media (max-width: 720px) {
+  #hd-brain-galaxy {
+    /* Use an aspect ratio to calculate the height automatically */
+    height: auto;
+    aspect-ratio: 700 / 440;
+  }
 }
 </style>
 
