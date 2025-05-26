@@ -31,8 +31,9 @@
   width: 180px;
   height: 240px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  flex-direction: column;
 }
 .agent-card.transitioning {
   filter: blur(8px) brightness(1.2);
@@ -76,13 +77,15 @@
   pointer-events: none;
   z-index: 10;
 }
-/* Speech bubble styling */
-.speech-bubble {
+/* Speech bubble above card */
+.speech-bubble-above {
   position: absolute;
-  left: 100%;
-  top: 18px;
-  min-width: 120px;
-  max-width: 220px;
+  left: 50%;
+  top: auto;
+  bottom: 100%;
+  transform: translateX(-50%);
+  min-width: 160px;
+  max-width: 90vw;
   background: #fff;
   color: #222;
   border: 3px solid #ff2222;
@@ -94,29 +97,30 @@
   text-align: left;
   font-family: inherit;
   line-height: 1.3;
-  margin-left: 12px;
+  margin-left: 0;
+  margin-bottom: 18px;
 }
-.speech-bubble:after {
+.speech-bubble-above:after, .speech-bubble-above:before {
+  left: 50%;
+  border: solid transparent;
   content: "";
-  position: absolute;
-  left: -18px;
-  top: 24px;
-  width: 0;
   height: 0;
-  border-top: 12px solid transparent;
-  border-bottom: 12px solid transparent;
-  border-right: 18px solid #ff2222;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  transform: translateX(-50%);
 }
-.speech-bubble:before {
-  content: "";
-  position: absolute;
-  left: -15px;
-  top: 26px;
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-right: 15px solid #fff;
+.speech-bubble-above:after {
+  top: 100%;
+  border-top: 18px solid #ff2222;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+}
+.speech-bubble-above:before {
+  top: calc(100% + 3px);
+  border-top: 15px solid #fff;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
 }
 .arrow {
   width: 48px;
@@ -167,6 +171,38 @@
 .param-slider {
   width: 100%;
   margin: 0;
+  background: transparent;
+  position: relative;
+}
+.param-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  background: #ccc;
+  border-radius: 3px;
+}
+.param-slider::-webkit-slider-thumb {
+  width: 22px;
+  height: 22px;
+  background: #ff2222;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  margin-top: -8px;
+  cursor: pointer;
+  box-shadow: 0 0 6px #ff2222aa;
+}
+.param-slider:focus {
+  outline: none;
+}
+.slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+.slider-ticks span {
+  width: 2px;
+  height: 10px;
+  background: #ff2222;
+  display: inline-block;
 }
 .slider-notches {
   display: flex;
@@ -180,9 +216,10 @@
   .agent-wheel-container { width: 99vw; padding: 0 2vw; }
   .agent-card { width: 120px; height: 160px; }
   .agent-card.left, .agent-card.right { width: 80px; height: 110px; }
-  .speech-bubble { font-size: 0.92em; min-width: 80px; max-width: 120px; }
+  .speech-bubble-above { font-size: 0.92em; min-width: 80px; max-width: 98vw; }
   .arrow.left { left: -10px; }
   .arrow.right { right: -10px; }
+  .param-slider-container { max-width: 99vw; }
 }
 </style>
 
@@ -199,18 +236,18 @@
   <div class="param-slider-container">
     <div>
       <div class="param-slider-label">Decoding Strategy</div>
-      <input type="range" min="0" max="2" step="1" value="0" class="param-slider" id="decodingSlider"
-        list="decodingNotches" />
+      <input type="range" min="0" max="2" step="1" value="0" class="param-slider" id="decodingSlider" />
+      <div class="slider-ticks"><span></span><span></span><span></span></div>
       <div class="slider-notches">
         <span>Greedy</span>
-        <span>Top-k</span>
+        <span>p</span>
         <span>Sampling</span>
       </div>
     </div>
     <div>
       <div class="param-slider-label">Temperature</div>
-      <input type="range" min="0" max="2" step="1" value="1" class="param-slider" id="tempSlider"
-        list="tempNotches" />
+      <input type="range" min="0" max="2" step="1" value="1" class="param-slider" id="tempSlider" />
+      <div class="slider-ticks"><span></span><span></span><span></span></div>
       <div class="slider-notches">
         <span>Low</span>
         <span>Medium</span>
@@ -272,7 +309,7 @@ const speechBubbles = [
       "I will challenge the status quo to uncover deeper truths."
     ]
   ],
-  // Decoding 1: Top-k
+  // Decoding 1: p
   [
     // Temp 0: Low
     [
@@ -346,22 +383,28 @@ function renderWheel(animate = false) {
   // Center card (focus)
   const centerCard = document.createElement('div');
   centerCard.className = 'agent-card focus';
-  centerCard.innerHTML = `<img src="${agents[selected].img}" alt="${agents[selected].name}">${cardFrameSVG}
-    <div class="speech-bubble">${speechBubbles[decoding][temp][selected]}</div>`;
+  centerCard.innerHTML = `
+    <div class="speech-bubble-above">${speechBubbles[decoding][temp][selected]}</div>
+    <img src="${agents[selected].img}" alt="${agents[selected].name}">${cardFrameSVG}
+  `;
   wheel.appendChild(centerCard);
 
   // Left card (background)
   const leftCard = document.createElement('div');
   leftCard.className = 'agent-card left';
-  leftCard.innerHTML = `<img src="${agents[left].img}" alt="${agents[left].name}">${cardFrameSVG}
-    <div class="speech-bubble">${speechBubbles[decoding][temp][left]}</div>`;
+  leftCard.innerHTML = `
+    <div class="speech-bubble-above">${speechBubbles[decoding][temp][left]}</div>
+    <img src="${agents[left].img}" alt="${agents[left].name}">${cardFrameSVG}
+  `;
   wheel.appendChild(leftCard);
 
   // Right card (background)
   const rightCard = document.createElement('div');
   rightCard.className = 'agent-card right';
-  rightCard.innerHTML = `<img src="${agents[right].img}" alt="${agents[right].name}">${cardFrameSVG}
-    <div class="speech-bubble">${speechBubbles[decoding][temp][right]}</div>`;
+  rightCard.innerHTML = `
+    <div class="speech-bubble-above">${speechBubbles[decoding][temp][right]}</div>
+    <img src="${agents[right].img}" alt="${agents[right].name}">${cardFrameSVG}
+  `;
   wheel.appendChild(rightCard);
 
   // Blur animation if needed
