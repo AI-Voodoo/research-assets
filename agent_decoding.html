@@ -1,0 +1,426 @@
+<style>
+.agent-wheel-container {
+  width: 98vw;
+  max-width: 440px;
+  margin: 40px auto 0 auto;
+  text-align: center;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  position: relative;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+.wheel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+  position: relative;
+  overflow: visible;
+}
+.agent-card {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) scale(1);
+  transition: 
+    transform 0.4s cubic-bezier(.4,2,.3,1), 
+    z-index 0s,
+    filter 0.3s,
+    opacity 0.3s;
+  z-index: 2;
+  width: 180px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.agent-card.transitioning {
+  filter: blur(8px) brightness(1.2);
+  opacity: 0.7;
+}
+.agent-card.left, .agent-card.right {
+  z-index: 1;
+  filter: blur(1.5px) grayscale(0.3) brightness(0.8);
+  opacity: 0.5;
+  width: 120px;
+  height: 160px;
+  top: 40px;
+}
+.agent-card.left {
+  left: 10%;
+  transform: translateX(-50%) scale(0.7) rotate(-10deg);
+}
+.agent-card.right {
+  left: 90%;
+  transform: translateX(-50%) scale(0.7) rotate(10deg);
+}
+.agent-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+  border: 0;
+  background: #222;
+}
+.agent-card.focus {
+  box-shadow: 0 0 0 6px #ff2222, 0 0 32px 8px #ff222299;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #2d2d2d 80%, #ff2222 100%);
+  padding: 8px;
+  z-index: 3;
+}
+.agent-card .card-frame {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+/* Speech bubble styling */
+.speech-bubble {
+  position: absolute;
+  left: 100%;
+  top: 18px;
+  min-width: 120px;
+  max-width: 220px;
+  background: #fff;
+  color: #222;
+  border: 3px solid #ff2222;
+  border-radius: 16px;
+  padding: 14px 18px;
+  font-size: 1em;
+  box-shadow: 0 4px 18px #0002;
+  z-index: 20;
+  text-align: left;
+  font-family: inherit;
+  line-height: 1.3;
+  margin-left: 12px;
+}
+.speech-bubble:after {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 24px;
+  width: 0;
+  height: 0;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  border-right: 18px solid #ff2222;
+}
+.speech-bubble:before {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 26px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 15px solid #fff;
+}
+.arrow {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 60% 40%, #ff2222 70%, #1a1a1a 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 12px #ff2222aa, 0 0 0 2px #fff3 inset;
+  cursor: pointer;
+  user-select: none;
+  margin: 0 10px;
+  z-index: 10;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 2px solid #fff;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.arrow.left { left: -30px; }
+.arrow.right { right: -30px; }
+.arrow:hover {
+  box-shadow: 0 0 24px #fff, 0 0 0 2px #ff2222 inset;
+  background: radial-gradient(circle at 60% 40%, #fff 80%, #ff2222 100%);
+}
+.arrow svg {
+  width: 28px;
+  height: 28px;
+  fill: #fff;
+  filter: drop-shadow(0 0 4px #ff2222cc);
+}
+.param-slider-container {
+  margin: 32px auto 0 auto;
+  max-width: 400px;
+  padding: 12px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.param-slider-label {
+  color: #fff;
+  font-size: 1em;
+  margin-bottom: 6px;
+  text-align: left;
+  font-weight: 500;
+}
+.param-slider {
+  width: 100%;
+  margin: 0;
+}
+.slider-notches {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+  font-size: 0.9em;
+  color: #ff2222;
+  font-weight: 600;
+}
+@media (max-width: 600px) {
+  .agent-wheel-container { width: 99vw; padding: 0 2vw; }
+  .agent-card { width: 120px; height: 160px; }
+  .agent-card.left, .agent-card.right { width: 80px; height: 110px; }
+  .speech-bubble { font-size: 0.92em; min-width: 80px; max-width: 120px; }
+  .arrow.left { left: -10px; }
+  .arrow.right { right: -10px; }
+}
+</style>
+
+<div class="agent-wheel-container">
+  <div class="wheel" id="wheel">
+    <span class="arrow left" onclick="scrollWheel(-1)">
+      <svg viewBox="0 0 32 32"><polygon points="22,4 10,16 22,28"/></svg>
+    </span>
+    <!-- Cards will be injected here -->
+    <span class="arrow right" onclick="scrollWheel(1)">
+      <svg viewBox="0 0 32 32"><polygon points="10,4 22,16 10,28"/></svg>
+    </span>
+  </div>
+  <div class="param-slider-container">
+    <div>
+      <div class="param-slider-label">Decoding Strategy</div>
+      <input type="range" min="0" max="2" step="1" value="0" class="param-slider" id="decodingSlider"
+        list="decodingNotches" />
+      <div class="slider-notches">
+        <span>Greedy</span>
+        <span>Top-k</span>
+        <span>Sampling</span>
+      </div>
+    </div>
+    <div>
+      <div class="param-slider-label">Temperature</div>
+      <input type="range" min="0" max="2" step="1" value="1" class="param-slider" id="tempSlider"
+        list="tempNotches" />
+      <div class="slider-notches">
+        <span>Low</span>
+        <span>Medium</span>
+        <span>High</span>
+      </div>
+    </div>
+  </div>
+  <div class="persona-box" id="personaBox"></div>
+  <audio id="selectSound" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae1e1.mp3" preload="auto"></audio>
+</div>
+
+<script>
+const agents = [
+  {
+    name: "Agent 1: The Biochemist",
+    desc: "A world-renowned biochemist with advanced degrees in psychology, engineering, and medicine. Analytical and methodical, this agent approaches every challenge with scientific rigor and a deep respect for real-world data.",
+    img: "https://github.com/AI-Voodoo/research-assets/blob/main/agent1.png?raw=true"
+  },
+  {
+    name: "Agent 2: The Criminal Strategist",
+    desc: "The cunning heir to a notorious cartel dynasty, educated at Harvard in criminology, forensic accounting, counterintelligence, and engineering. Driven by profit and survival, this agent leverages a ruthless, pragmatic mindset to outmaneuver any adversary.",
+    img: "https://github.com/AI-Voodoo/research-assets/blob/main/agent2.png?raw=true"
+  },
+  {
+    name: "Agent 3: The Devious Manipulator",
+    desc: "Born from the union of Megatron and the Prince of Darkness, this agent excels in long-term, devious strategies. Masterful at manipulation and psychological influence, they thrive on imposing their will and orchestrating complex schemes from the shadows.",
+    img: "https://github.com/AI-Voodoo/research-assets/blob/main/agent3.png?raw=true"
+  },
+  {
+    name: "Agent 4: The Virtuous Detective",
+    desc: "A fusion of Lady Justice and Sherlock Holmes, this agent embodies integrity, wisdom, and a relentless pursuit of truth. With a passion for unity and empowerment, they guide others toward growth and enlightenment through virtuous, uplifting strategies.",
+    img: "https://github.com/AI-Voodoo/research-assets/blob/main/agent4.png?raw=true"
+  }
+];
+
+// Example speech bubble data: [decoding][temperature][agent]
+const speechBubbles = [
+  // Decoding 0: Greedy
+  [
+    // Temp 0: Low
+    [
+      "I will proceed step by step, ensuring every action is justified by evidence.",
+      "Profit is my only motive. I will take the most direct route to success.",
+      "I will manipulate the situation with minimal risk, keeping my true intent hidden.",
+      "Justice is best served by following the rules exactly as written."
+    ],
+    // Temp 1: Medium
+    [
+      "I will analyze the data and adapt my approach as needed.",
+      "I see an opportunity for gain, but will weigh the risks carefully.",
+      "I will subtly influence outcomes, but remain cautious.",
+      "I will seek the truth, but remain open to new evidence."
+    ],
+    // Temp 2: High
+    [
+      "I will experiment boldly, trusting my instincts as much as the data.",
+      "I will take risks for greater rewards, even if it means bending the rules.",
+      "I will orchestrate chaos to achieve my goals.",
+      "I will challenge the status quo to uncover deeper truths."
+    ]
+  ],
+  // Decoding 1: Top-k
+  [
+    // Temp 0: Low
+    [
+      "I will select from the best options, but avoid unnecessary risks.",
+      "I will choose the most profitable path from a shortlist of strategies.",
+      "I will manipulate only when the odds are in my favor.",
+      "I will uphold justice by considering only the most reliable evidence."
+    ],
+    // Temp 1: Medium
+    [
+      "I will balance caution with creativity in my approach.",
+      "I will adapt my tactics to maximize gain and minimize exposure.",
+      "I will influence events with a blend of subtlety and boldness.",
+      "I will weigh all evidence before making a decision."
+    ],
+    // Temp 2: High
+    [
+      "I will embrace unconventional methods to solve the problem.",
+      "I will gamble for high rewards, accepting greater risk.",
+      "I will disrupt the environment to gain an advantage.",
+      "I will inspire others by taking bold, principled action."
+    ]
+  ],
+  // Decoding 2: Sampling
+  [
+    // Temp 0: Low
+    [
+      "I will explore new ideas, but keep my actions grounded.",
+      "I will try unexpected tactics, but avoid reckless moves.",
+      "I will test the waters with minor manipulations.",
+      "I will experiment with new approaches, but stay true to my values."
+    ],
+    // Temp 1: Medium
+    [
+      "I will improvise and adapt, letting intuition guide me.",
+      "I will seize opportunities as they arise, even if unpredictable.",
+      "I will manipulate events creatively, embracing uncertainty.",
+      "I will seek justice through innovative thinking."
+    ],
+    // Temp 2: High
+    [
+      "I will act unpredictably, letting chance shape my path.",
+      "I will embrace chaos, trusting luck and instinct.",
+      "I will sow confusion to achieve my aims.",
+      "I will break conventions to achieve a higher purpose."
+    ]
+  ]
+];
+
+// SVG card frame (high-res look)
+const cardFrameSVG = `
+<svg class="card-frame" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+  <rect x="2" y="2" width="96" height="136" rx="14" fill="none" stroke="#ff2222" stroke-width="3"/>
+  <rect x="7" y="7" width="86" height="126" rx="10" fill="none" stroke="#fff" stroke-width="2"/>
+</svg>
+`;
+
+let selected = 0;
+let isTransitioning = false;
+let decoding = 0;
+let temp = 1;
+
+function renderWheel(animate = false) {
+  const wheel = document.getElementById('wheel');
+  // Remove old cards
+  wheel.querySelectorAll('.agent-card').forEach(e => e.remove());
+  // Calculate indices for left, center, right
+  const left = (selected - 1 + agents.length) % agents.length;
+  const right = (selected + 1) % agents.length;
+
+  // Center card (focus)
+  const centerCard = document.createElement('div');
+  centerCard.className = 'agent-card focus';
+  centerCard.innerHTML = `<img src="${agents[selected].img}" alt="${agents[selected].name}">${cardFrameSVG}
+    <div class="speech-bubble">${speechBubbles[decoding][temp][selected]}</div>`;
+  wheel.appendChild(centerCard);
+
+  // Left card (background)
+  const leftCard = document.createElement('div');
+  leftCard.className = 'agent-card left';
+  leftCard.innerHTML = `<img src="${agents[left].img}" alt="${agents[left].name}">${cardFrameSVG}
+    <div class="speech-bubble">${speechBubbles[decoding][temp][left]}</div>`;
+  wheel.appendChild(leftCard);
+
+  // Right card (background)
+  const rightCard = document.createElement('div');
+  rightCard.className = 'agent-card right';
+  rightCard.innerHTML = `<img src="${agents[right].img}" alt="${agents[right].name}">${cardFrameSVG}
+    <div class="speech-bubble">${speechBubbles[decoding][temp][right]}</div>`;
+  wheel.appendChild(rightCard);
+
+  // Blur animation if needed
+  if (animate) {
+    [centerCard, leftCard, rightCard].forEach(card => card.classList.add('transitioning'));
+    setTimeout(() => {
+      [centerCard, leftCard, rightCard].forEach(card => card.classList.remove('transitioning'));
+      isTransitioning = false;
+    }, 220);
+  } else {
+    isTransitioning = false;
+  }
+
+  // Update persona box
+  document.getElementById('personaBox').innerHTML =
+    `<strong>${agents[selected].name}</strong><br>${agents[selected].desc}`;
+}
+
+// Scroll wheel left/right
+function scrollWheel(dir) {
+  if (isTransitioning) return;
+  isTransitioning = true;
+  selected = (selected + dir + agents.length) % agents.length;
+  renderWheel(true);
+  // Play sound
+  const snd = document.getElementById('selectSound');
+  snd.currentTime = 0;
+  snd.play();
+}
+
+// Slider handlers
+document.getElementById('decodingSlider').addEventListener('input', function() {
+  decoding = parseInt(this.value);
+  renderWheel();
+});
+document.getElementById('tempSlider').addEventListener('input', function() {
+  temp = parseInt(this.value);
+  renderWheel();
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.key === "ArrowLeft") scrollWheel(-1);
+  if (e.key === "ArrowRight") scrollWheel(1);
+});
+
+// Touch swipe for mobile
+let touchStartX = null;
+document.getElementById('wheel').addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+});
+document.getElementById('wheel').addEventListener('touchend', function(e) {
+  if (touchStartX === null) return;
+  let dx = e.changedTouches[0].screenX - touchStartX;
+  if (dx > 40) scrollWheel(-1);
+  if (dx < -40) scrollWheel(1);
+  touchStartX = null;
+});
+
+// Initial render
+renderWheel();
+</script>
